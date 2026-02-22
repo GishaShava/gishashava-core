@@ -1,5 +1,8 @@
 # בתוך קובץ settings.py בתיקיית core_server
+import os
 
+# ניסיון למשוך את המפתח ממשתני הסביבה (מהקובץ .env שיצרנו קודם)
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-development-key-only')
 DEBUG = False  # בשלב הייצור תמיד False
 
 # הוספתי את הכתובת של השרת שלך
