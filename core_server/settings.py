@@ -1,11 +1,22 @@
-# בתוך קובץ settings.py בתיקיית core_server
 import os
+from pathlib import Path
 
-# ניסיון למשוך את המפתח ממשתני הסביבה (מהקובץ .env שיצרנו קודם)
+# 1. הגדרת נתיב הבסיס - קריטי להפעלת השרת
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# טעינת משתני סביבה מה-.env (כדי שה-SECRET_KEY יעבוד ב-Terminal)
+env_path = BASE_DIR / '.env'
+if env_path.exists():
+    with open(env_path) as f:
+        for line in f:
+            if line.startswith('export '):
+                key, value = line.replace('export ', '', 1).strip().split('=', 1)
+                os.environ[key.strip()] = value.strip().strip("'").strip('"')
+
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-development-key-only')
-DEBUG = False  # בשלב הייצור תמיד False
 
-# הוספתי את הכתובת של השרת שלך
+DEBUG = False
+
 ALLOWED_HOSTS = ['gishashava.pythonanywhere.com', 'localhost', '127.0.0.1']
 
 INSTALLED_APPS = [
@@ -15,21 +26,23 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',      # ודא שהוספת את זה
-    'corsheaders',         # ודא שהוספת את זה
-    'licenses',            # שם האפליקציה שלך
+    'rest_framework',
+    'corsheaders',
+    'licenses',
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware', # חייב להיות ראשון!
-    'django.middleware.common.CommonMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+ROOT_URLCONF = 'core_server.urls'
 
 TEMPLATES = [
     {
@@ -47,7 +60,37 @@ TEMPLATES = [
     },
 ]
 
-# הגדרות CORS - מאפשר לאתר ב-GitHub "לדבר" עם השרת
+WSGI_APPLICATION = 'core_server.wsgi.application'
+
+# 2. הגדרת בסיס הנתונים - זה מה שהיה חסר בשגיאה שלך!
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+
+# הגדרות סיסמה
+AUTH_PASSWORD_VALIDATORS = [
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+]
+
+# שפה וזמן
+LANGUAGE_CODE = 'he'
+TIME_ZONE = 'Israel'
+USE_I18N = True
+USE_TZ = True
+
+# 3. קבצים סטטיים - קריטי למראה של ה-Admin
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# CORS
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
     "https://gishashava.github.io",
