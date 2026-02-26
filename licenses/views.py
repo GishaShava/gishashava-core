@@ -1,4 +1,4 @@
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
@@ -7,6 +7,7 @@ from .models import ClientLicense
 
 @csrf_exempt  # פטור מבדיקת CSRF (קריטי ל-API חיצוני)
 @api_view(['GET'])
+@authentication_classes([])
 @permission_classes([AllowAny])  # מבטיח שגם משתמשים לא מחוברים יוכלו לבדוק רישיון
 def validate_license(request):
     key = request.GET.get('key')
