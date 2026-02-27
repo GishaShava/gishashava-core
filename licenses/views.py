@@ -11,9 +11,13 @@ from .models import ClientLicense
 @authentication_classes([])
 @permission_classes([AllowAny])
 def validate_license(request):
-    key = request.GET.get('key')
+    # הדפסת כל ה-Headers כדי לראות מה הדפדפן באמת שולח
+    print(f"--- DEBUG START ---")
+    print(f"ALL HEADERS: {request.headers}")
+    print(f"ORIGIN: {request.headers.get('Origin')}")
+    print(f"REFERER: {request.META.get('HTTP_REFERER')}")
 
-    # 1. שליפת מקור הבקשה (Origin או Referer)
+    key = request.GET.get('key')
     raw_origin = request.headers.get('Origin') or request.META.get('HTTP_REFERER', '')
 
     # 2. זיקוק הדומיין בלבד (למשל: מוריד https וסלאשים)
